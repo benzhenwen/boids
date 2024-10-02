@@ -8,7 +8,7 @@ public:
     enum log_level {DEBUG, INFO, WARNING, CRITICAL};
 
 protected:
-    const char * name;
+    const std::string_view name;
     const log_level level;
 
     class Log {
@@ -40,7 +40,7 @@ protected:
         }
     }
 public:
-    constexpr Logger(char * _name, log_level _log_level = INFO):
+    constexpr Logger(std::string_view _name, log_level _log_level = INFO):
         name(_name), level(_log_level) {}
     
     template<typename T>
