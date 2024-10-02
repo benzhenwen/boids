@@ -14,7 +14,7 @@ protected:
     class Log {
     public:
         template<typename T>
-        const Log & operator<<(T& input) const { 
+        const Log & operator<<(const T& input) const { 
             std::cout << input;
             return *this;
         }
@@ -40,37 +40,21 @@ protected:
         }
     }
 public:
-    constexpr Logger(const char * _name, log_level _log_level = INFO):
+    constexpr Logger(char * _name, log_level _log_level = INFO):
         name(_name), level(_log_level) {}
     
     template<typename T>
     const Log operator<<(const T& input) const { 
         return log(input);
     }
-
     template<typename T>
-    const Log log(const T& input) const {
+    const Log log(const T& input = "") const {
         std::cout << '[' << ANSI_ESCAPE(ANSI_TEXT_GREEN) << name << ' ' << get_level_text(level) << "] " << input;
         return Log();
     }
     template<typename T>
-    const Log log_debug(const T& input) const {
-        std::cout << '[' << ANSI_ESCAPE(ANSI_TEXT_GREEN) << name << ' ' << get_level_text(DEBUG) << "] " << input;
-        return Log();
-    }
-    template<typename T>
-    const Log log_info(const T& input) const {
-        std::cout << '[' << ANSI_ESCAPE(ANSI_TEXT_GREEN) << name << ' ' << get_level_text(INFO) << "] " << input;
-        return Log();
-    }
-    template<typename T>
-    const Log log_warning(const T& input) const {
-        std::cout << '[' << ANSI_ESCAPE(ANSI_TEXT_GREEN) << name << ' ' << get_level_text(WARNING) << "] " << input;
-        return Log();
-    }
-    template<typename T>
-    const Log log_critical(const T& input) const {
-        std::cout << '[' << ANSI_ESCAPE(ANSI_TEXT_GREEN) << name << ' ' << get_level_text(CRITICAL) << "] " << input;
+    const Log log(log_level _log_level, const T& input = "") const {
+        std::cout << '[' << ANSI_ESCAPE(ANSI_TEXT_GREEN) << name << ' ' << get_level_text(_log_level) << "] " << input;
         return Log();
     }
 };
