@@ -1,2 +1,2 @@
 project('boids', 'cpp')
-executable('boids', 'main.cpp')
+executable('boids', 'src/main.cpp')
