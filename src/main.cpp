@@ -36,7 +36,7 @@ int main(int argc, char* args[]) {
 
             SDL_SetRenderDrawColor(renderer, 220, 220, 220, 255);
 
-            boid_sim::initialize(40);
+            boid_sim::initialize(100);
             SDL_RenderClear(renderer);
             boid_sim::draw_to(renderer);
             SDL_RenderPresent(renderer);

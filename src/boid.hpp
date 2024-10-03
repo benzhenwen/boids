@@ -14,12 +14,12 @@ namespace boid_sim {
 
     float protected_range = 40; // px
     float visual_range = 150; // px
-    float screen_margin = 100;
-    float turn_factor = 2000;
+    float screen_margin = 150;
+    float turn_factor = 1000;
     float centering_factor = 0.4;
-    float avoid_factor = 10;
-    float matching_factor = 0.4;
-    float max_speed = 450;
+    float avoid_factor = 12;
+    float matching_factor = 2;
+    float max_speed = 500;
     float min_speed = 300;
     float max_bias = 0.00;
     float bias_increment = 0.00000;
@@ -48,7 +48,7 @@ namespace boid_sim {
     void initialize(const int boid_count, const float group_distribution = 0.5) {
         boid_list.resize(boid_count);
         for (int i = 0; i < boid_count; i++) {
-            boid_list[i] = boid(rand()%screen_width, rand()%screen_height, -200, 100, (i/(boid_count-1.0) > group_distribution));
+            boid_list[i] = boid(rand()%screen_width, rand()%screen_height, rand()%600-300, rand()%600-300, (i/(boid_count-1.0) > group_distribution));
         }
     }
     void update(duration delta) {
@@ -71,8 +71,8 @@ namespace boid_sim {
                         dy_close += b.y-o.y;
                     } else {
                         // alignment
-                        vx_avg += o.x;
-                        vy_avg += o.y;
+                        vx_avg += o.vx;
+                        vy_avg += o.vy;
                         // cohesion
                         x_avg += o.x;
                         y_avg += o.y;
