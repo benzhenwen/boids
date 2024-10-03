@@ -21,8 +21,8 @@ namespace boid_sim {
     float matching_factor = 2;
     float max_speed = 500;
     float min_speed = 300;
-    float max_bias = 0.00;
-    float bias_increment = 0.00000;
+    float max_bias = 0.01;
+    float bias_increment = 0.00004;
 
     const float BOID_SIZE = 10; // px radius
     const SDL_Color BOID_COLOR = {255, 5, 5, 255};
