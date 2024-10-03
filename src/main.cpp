@@ -1,45 +1,66 @@
 #include <SDL2/SDL.h>
 
+#include <src/boid.hpp>
 #include <src/logger/logger.hpp>
+static constexpr Logger logger = Logger("MAIN");
 
-constexpr Logger logger = Logger("MAIN");
+#include <thread>
+#include <chrono>
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 1500;
+const int SCREEN_HEIGHT = 800;
+const int MAX_FPS = 60;
+
+duration time_now() {
+    return std::chrono::duration_cast<duration>(std::chrono::system_clock::now().time_since_epoch());
+}
 
 int main(int argc, char* args[]) {
-    //The window we'll be rendering to
+
     SDL_Window* window = NULL;
-    
-    //The surface contained by the window
-    SDL_Surface* screenSurface = NULL;
+    SDL_Renderer* renderer = NULL;
 
-    //Initialize SDL
-    if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
-    {
+    if( SDL_Init( SDL_INIT_VIDEO ) < 0 ){
         printf( "SDL could not initialize! SDL_Error: %s\n", SDL_GetError() );
-    }
-    else
-    {
-        //Create window
-        window = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
-        if( window == NULL )
-        {
+    } else {
+        window = SDL_CreateWindow( "Boids", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
+        if( window == NULL ) {
             printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
-        }
-        else
-        {
-            //Get window surface
-            screenSurface = SDL_GetWindowSurface( window );
+        } else {
+            renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-            //Fill the surface white
-            SDL_FillRect( screenSurface, NULL, SDL_MapRGB( screenSurface->format, 0xFF, 0xFF, 0xFF ) );
-            
-            //Update the surface
-            SDL_UpdateWindowSurface( window );
+            if (renderer == NULL) {
+                logger.log(Logger::CRITICAL) << SDL_GetError();
+                return 1;
+            }
 
-            //Hack to get window to stay up
-            SDL_Event e; bool quit = false; while( quit == false ){ while( SDL_PollEvent( &e ) ){ if( e.type == SDL_QUIT ) quit = true; } }
+            SDL_SetRenderDrawColor(renderer, 220, 220, 220, 255);
+
+            boid_sim::initialize(40);
+            SDL_RenderClear(renderer);
+            boid_sim::draw_to(renderer);
+            SDL_RenderPresent(renderer);
+
+            duration minimum_time = duration(1000000000) / MAX_FPS;
+            duration previous_time = time_now();
+
+            SDL_Event e; 
+            bool quit = false; 
+            while(quit == false) { 
+                while(SDL_PollEvent(&e)){ 
+                    if( e.type == SDL_QUIT ) quit = true; 
+                }
+
+                duration difference = time_now() - previous_time;
+                if (difference > minimum_time) {
+                    previous_time = time_now();
+
+                    boid_sim::update(difference);
+                    SDL_RenderClear(renderer);
+                    boid_sim::draw_to(renderer);
+                    SDL_RenderPresent(renderer);
+                }
+            }
         }
     }
 
