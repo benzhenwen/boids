@@ -1,3 +1,5 @@
+#pragma once
+
 #include <SDL2/SDL.h>
 
 #include <src/logger/logger.hpp>
@@ -19,8 +21,9 @@ namespace boid_sim {
     float centering_factor = 0.4;
     float avoid_factor = 12;
     float matching_factor = 2;
-    float max_speed = 500;
+    float max_speed = 550;
     float min_speed = 300;
+
     float max_bias = 0.01;
     float bias_increment = 0.00004;
 
@@ -49,7 +52,7 @@ namespace boid_sim {
         boid_list.resize(boid_count);
         for (int i = 0; i < boid_count; i++) {
             boid_list[i] = boid(rand()%screen_width, rand()%screen_height, rand()%600-300, rand()%600-300, (i/(boid_count-1.0) > group_distribution));
-        }
+        } 
     }
     void update(duration delta) {
         float ds = delta.count() / 1000000000.0;
@@ -139,20 +142,20 @@ namespace boid_sim {
             boid & b = boid_list[i];
             float a = std::atan2(b.vy, b.vx);
 
-            std::vector<SDL_Vertex> verticies;
-            verticies.push_back({
+            SDL_Vertex verticies[3];
+            verticies[0] = {
                 {std::cos(a)*BOID_SIZE + b.x, std::sin(a)*BOID_SIZE + b.y},
-                BOID_COLOR,
-            });
-            verticies.push_back({
+                BOID_COLOR
+            };
+            verticies[1] = {
                 {std::cos(a + back_angle_1)*BOID_SIZE + b.x, std::sin(a + back_angle_1)*BOID_SIZE + b.y},
-                BOID_COLOR,
-            });
-            verticies.push_back({
+                BOID_COLOR
+            };
+            verticies[2] = {
                 {std::cos(a + back_angle_2)*BOID_SIZE + b.x, std::sin(a + back_angle_2)*BOID_SIZE + b.y},
-                BOID_COLOR,
-            });
-            SDL_RenderGeometry(renderer, NULL, verticies.data(), verticies.size(), NULL, verticies.size());
+                BOID_COLOR
+            };
+            SDL_RenderGeometry(renderer, NULL, verticies, 3, NULL, 3);
         }
     }
 }
