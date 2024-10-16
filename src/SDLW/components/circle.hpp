@@ -9,9 +9,8 @@
 #include <iostream>
 
 namespace SDLW::Components {
-class Elipse: 
+class Circle: 
 public Component, 
-public Component::Rotated, 
 public Component::Colored {
 
 protected:
@@ -21,10 +20,8 @@ protected:
     void create_verticies() {
         for (uint i = 0; i < verticies.size(); i++) {
             float a = ((float) i) / verticies.size() * M_PI * 2;
-            float temp_x = std::cos(a) * w;
-            float temp_y = std::sin(a) * h;
             verticies[i] = {
-                {x + temp_x*std::cos(rotation) - temp_y*std::sin(rotation), y + temp_x*std::sin(rotation) + temp_y*std::cos(rotation)},
+                {x + std::cos(a) * radius , y + std::sin(a) * radius},
                 color
             };
         }
@@ -49,14 +46,12 @@ protected:
     }
 
 public:
-    Stagable<float> w, h;
+    Stagable<float> radius;
     
-    Elipse(float _x, float _y, float _rotation, float _w, float _h, int _verticies, Color _color): 
+    Circle(float _x, float _y, float _radius, int _verticies, Color _color): 
     Component(_x, _y),
-    Component::Rotated(_rotation, *this),
     Component::Colored(_color, *this),
-    w(_w, *this),
-    h(_h, *this),
+    radius(_radius, *this),
     verticies(_verticies) {
         create_verticies();
     }

@@ -2,11 +2,10 @@
 
 #include <SDL2/SDL.h>
 
-namespace SDLW {
-class Component {
-friend class Window;
+#include <iostream>
 
-public:
+namespace SDLW {
+
 struct Color: public SDL_Color {
     bool operator==(Color other) {
         return
@@ -17,26 +16,91 @@ struct Color: public SDL_Color {
     }
 };
 
+class Component {
+friend class Window;
+
+private:
+    bool staged = false;
+
 protected:
-    float x, y;
-    float rotation;
+template <typename T>
+struct Stagable {
+protected:
+    T value;
+    Component & component;
 public:
-    float stage_x = x;
-    float stage_y = y;
-    float stage_rotation = rotation;
+    Stagable(T _value, Component & _component):
+    value(_value), component(_component) {}
 
-    float get_x() { return x; }
-    float get_y() { return y; }
-    float get_rotation() { return rotation; }
+    [[nodiscard]] operator const T&() const { 
+        return value; 
+    }
+    inline void operator=(T other) {
+        value = other;
+        component.staged = true;
+    }
+    inline void operator+=(T other) {
+        value += other;
+        component.staged = true;
+    }
+    inline void operator-=(T other) {
+        value -= other;
+        component.staged = true;
+    }
+    inline void operator*=(T other) {
+        value *= other;
+        component.staged = true;
+    }
+    inline void operator/=(T other) {
+        value /= other;
+        component.staged = true;
+    }
+    inline void operator&=(T other) {
+        value &= other;
+        component.staged = true;
+    }
+    inline void operator|=(T other) {
+        value |= other;
+        component.staged = true;
+    }
+    inline void operator^=(T other) {
+        value ^= other;
+        component.staged = true;
+    }
+    inline void operator<<=(T other) {
+        value <<= other;
+        component.staged = true;
+    }
+    inline void operator>>=(T other) {
+        value >>= other;
+        component.staged = true;
+    }
+};
+
+public:
+    Stagable<float> x, y;
+
+struct Rotated {
+    Stagable<float> rotation;
+    Rotated(float _rotation, Component & component): rotation(_rotation, component) {}
+};
+struct Colored {
+    Stagable<Color> color;
+    Colored(Color _color, Component & component): color(_color, component) {}
+};
 
 protected:
-    Component(float _x, float _y, float _rotation):
-    x(_x), y(_y), rotation(_rotation) {};
+    Component(float _x, float _y):
+    x(_x, *this), 
+    y(_y, *this) {}
 
     virtual void push_stage() = 0;
     virtual void render_to(SDL_Renderer * renderer) = 0;
     inline void update(SDL_Renderer * renderer) {
-        push_stage();
+        if (staged) {
+            push_stage();
+            staged = false;
+        }
         render_to(renderer);
     }
 };

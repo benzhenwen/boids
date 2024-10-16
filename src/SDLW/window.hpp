@@ -40,6 +40,8 @@ public:
             logger.log(Logger::CRITICAL) << SDL_GetError();
             throw std::runtime_error("Renderer component failed to initialize");
         }
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
         count++;   
         logger << "Window " << get_id() << " successfully created!";        
     }
